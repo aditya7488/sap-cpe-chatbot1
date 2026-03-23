@@ -83,7 +83,6 @@ async function send(){
   sendBtn.disabled = true;
 
   inp.value = "";
-
   addMsg('user', text);
 
   try{
@@ -91,9 +90,8 @@ async function send(){
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        message: text,
-        knowledge: KNOWLEDGE,
-        system: SYSTEM })
+        message: text
+      })
     });
 
     const data = await res.json();
