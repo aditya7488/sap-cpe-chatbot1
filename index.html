@@ -3,863 +3,94 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SAP CPE Learning Assistant</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<title>SAP CPE Chatbot</title>
+
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-
-:root{
-  --bg:#f7f6f2;
-  --surface:#ffffff;
-  --border:#e4e2db;
-  --border2:#d0cec5;
-  --text:#1a1916;
-  --text2:#6b6860;
-  --text3:#9e9b94;
-  --accent:#c85c2a;
-  --accent-light:#fdf1ec;
-  --accent2:#2a6ec8;
-  --accent2-light:#edf2fd;
-  --user-bg:#1a1916;
-  --user-text:#f7f6f2;
-  --mono:'DM Mono',monospace;
-  --sans:'DM Sans',sans-serif;
-  --r:10px;
+body {
+  font-family: Arial;
+  background: #f5f5f5;
+  padding: 20px;
 }
 
-body{
-  font-family:var(--sans);
-  background:var(--bg);
-  color:var(--text);
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
+#chat {
+  margin-top: 20px;
+  max-width: 600px;
 }
 
-/* ── Header ── */
-header{
-  display:flex;
-  align-items:center;
-  gap:14px;
-  padding:14px 20px;
-  background:var(--surface);
-  border-bottom:1px solid var(--border);
-  flex-shrink:0;
-}
-.logo{
-  width:38px;height:38px;
-  background:var(--accent);
-  border-radius:8px;
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--mono);
-  font-size:11px;font-weight:500;
-  color:#fff;letter-spacing:0.5px;
-}
-.header-text h1{font-size:14px;font-weight:500;letter-spacing:-0.2px;color:var(--text)}
-.header-text p{font-size:11px;color:var(--text3);margin-top:1px;font-family:var(--mono)}
-.badge{
-  margin-left:auto;
-  font-size:10px;
-  font-family:var(--mono);
-  color:var(--accent);
-  background:var(--accent-light);
-  border:1px solid #f0c4b0;
-  padding:3px 8px;
-  border-radius:4px;
-  letter-spacing:0.3px;
+.msg {
+  margin-bottom: 10px;
 }
 
-/* ── Quick topics ── */
-.topics{
-  display:flex;gap:6px;
-  padding:10px 20px;
-  border-bottom:1px solid var(--border);
-  overflow-x:auto;flex-shrink:0;
-  scrollbar-width:none;
-  background:var(--bg);
-}
-.topics::-webkit-scrollbar{display:none}
-.chip{
-  flex-shrink:0;
-  font-family:var(--mono);
-  font-size:10px;
-  padding:5px 11px;
-  border:1px solid var(--border2);
-  border-radius:20px;
-  background:var(--surface);
-  color:var(--text2);
-  cursor:pointer;
-  white-space:nowrap;
-  transition:all 0.12s;
-}
-.chip:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
-
-/* ── Chat ── */
-#chat{
-  flex:1;
-  overflow-y:auto;
-  padding:20px;
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-  scrollbar-width:thin;
-  scrollbar-color:var(--border) transparent;
+.user {
+  font-weight: bold;
 }
 
-/* Welcome */
-.welcome{
-  margin:auto;
-  max-width:400px;
-  text-align:center;
-}
-.welcome-badge{
-  display:inline-block;
-  font-family:var(--mono);
-  font-size:10px;
-  color:var(--text3);
-  border:1px solid var(--border2);
-  padding:4px 12px;
-  border-radius:20px;
-  margin-bottom:16px;
-  letter-spacing:0.5px;
-}
-.welcome h2{font-size:22px;font-weight:300;letter-spacing:-0.5px;color:var(--text);margin-bottom:8px}
-.welcome h2 span{font-weight:500;color:var(--accent)}
-.welcome p{font-size:13px;color:var(--text2);line-height:1.65}
-.suggs{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:6px;
-  margin-top:18px;
-}
-.sugg{
-  padding:10px 12px;
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:8px;
-  font-size:11px;
-  color:var(--text2);
-  cursor:pointer;
-  text-align:left;
-  line-height:1.5;
-  transition:all 0.12s;
-  font-family:var(--sans);
-}
-.sugg:hover{border-color:var(--accent);color:var(--text);background:var(--accent-light)}
-
-/* Messages */
-.msg{
-  display:flex;gap:10px;
-  max-width:720px;
-  animation:up 0.2s ease;
-}
-@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.msg.user{flex-direction:row-reverse;margin-left:auto}
-.av{
-  width:28px;height:28px;
-  border-radius:6px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:10px;font-weight:500;
-  font-family:var(--mono);
-  flex-shrink:0;margin-top:2px;
-}
-.av.bot{background:var(--accent);color:#fff}
-.av.user{background:var(--user-bg);color:#fff}
-.bub{
-  padding:11px 15px;
-  border-radius:10px;
-  font-size:13px;
-  line-height:1.7;
-  max-width:calc(100% - 46px);
-}
-.msg.user .bub{
-  background:var(--user-bg);
-  color:var(--user-text);
-  border-bottom-right-radius:3px;
-  font-size:13px;
-}
-.msg.bot .bub{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-bottom-left-radius:3px;
-  color:var(--text);
-}
-.bub b,.bub strong{color:var(--accent);font-weight:500}
-.bub code{
-  font-family:var(--mono);
-  font-size:11px;
-  background:var(--accent-light);
-  color:var(--accent);
-  padding:1px 5px;
-  border-radius:3px;
-}
-.bub ul{padding-left:16px;margin:6px 0}
-.bub li{margin-bottom:3px}
-.bub p+p{margin-top:8px}
-.src-tag{
-  display:inline-block;
-  font-family:var(--mono);
-  font-size:9px;
-  color:var(--text3);
-  border:1px solid var(--border);
-  padding:2px 7px;
-  border-radius:3px;
-  margin-bottom:7px;
-  letter-spacing:0.3px;
-}
-
-/* Typing */
-.typing .bub{padding:14px 15px}
-.dots{display:flex;gap:3px}
-.dots span{
-  width:5px;height:5px;border-radius:50%;
-  background:var(--border2);
-  animation:dot 1.2s infinite;
-}
-.dots span:nth-child(2){animation-delay:.2s}
-.dots span:nth-child(3){animation-delay:.4s}
-@keyframes dot{0%,60%,100%{transform:none}30%{transform:translateY(-4px)}}
-
-/* ── Input ── */
-.input-wrap{
-  padding:14px 20px 18px;
-  border-top:1px solid var(--border);
-  background:var(--surface);
-  flex-shrink:0;
-}
-.input-row{
-  display:flex;gap:8px;align-items:flex-end;
-  background:var(--bg);
-  border:1px solid var(--border2);
-  border-radius:var(--r);
-  padding:9px 10px;
-  transition:border-color 0.15s;
-}
-.input-row:focus-within{border-color:var(--accent)}
-#inp{
-  flex:1;background:none;border:none;outline:none;
-  color:var(--text);
-  font-family:var(--sans);font-size:13px;
-  resize:none;max-height:100px;line-height:1.5;
-  scrollbar-width:none;
-}
-#inp::placeholder{color:var(--text3)}
-#inp::-webkit-scrollbar{display:none}
-#send{
-  width:32px;height:32px;
-  border-radius:7px;border:none;
-  background:var(--accent);
-  color:#fff;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
-  transition:opacity 0.12s;
-}
-#send:hover{opacity:0.85}
-#send:disabled{opacity:0.3;cursor:default}
-.hint{
-  font-size:10px;
-  color:var(--text3);
-  text-align:center;
-  margin-top:7px;
-  font-family:var(--mono);
+.bot {
+  color: green;
 }
 </style>
 </head>
+
 <body>
 
-<header>
-  <div class="logo">CPE</div>
-  <div class="header-text">
-    <h1>SAP CPE Learning Assistant</h1>
-    <p>Vol 1 + Vol 2 · Suraj Pratap Singh</p>
-  </div>
-  <div class="badge">DATASET LOADED</div>
-</header>
+<h2>SAP CPE Chatbot</h2>
 
-<div class="topics">
-  <button class="chip" onclick="ask('What is CPE in SAP?')">What is CPE?</button>
-  <button class="chip" onclick="ask('What is a DCS ID?')">DCS ID</button>
-  <button class="chip" onclick="ask('What is a Formula Key in CPE?')">Formula Key</button>
-  <button class="chip" onclick="ask('What is a Term Key?')">Term Key</button>
-  <button class="chip" onclick="ask('What is a Quotation Rule?')">Quotation Rule</button>
-  <button class="chip" onclick="ask('What is Period Determination Rule?')">Period Det. Rule</button>
-  <button class="chip" onclick="ask('What is MIC in SAP CPE?')">MIC</button>
-  <button class="chip" onclick="ask('What are CPE Routines?')">CPE Routines</button>
-  <button class="chip" onclick="ask('What is BRF+ relevancy in CPE?')">BRF+</button>
-  <button class="chip" onclick="ask('What is mark to market in CPE?')">Mark to Market</button>
-  <button class="chip" onclick="ask('What are CPE Blocking Reasons?')">Blocking Reasons</button>
-  <button class="chip" onclick="ask('What are important CPE transaction codes?')">T-Codes</button>
-  <button class="chip" onclick="ask('Difference between Spot and Futures prices')">Spot vs Futures</button>
-  <button class="chip" onclick="ask('What is the Term Rule in CPE?')">Term Rule</button>
-</div>
+<input id="inp" placeholder="Ask something..." style="width:300px;">
+<button onclick="send()">Send</button>
 
-<div id="chat">
-  <div class="welcome" id="welcome">
-    <div class="welcome-badge">SAP · COMMODITY PRICING ENGINE</div>
-    <h2>Learn <span>SAP CPE</span><br>from your documents</h2>
-    <p>Ask anything from the Learning Journey on SAP CPE (Vol 1 & 2). Covers exchanges, DCS IDs, Formula Keys, CPE architecture, BRF+, routines and more.</p>
-    <div class="suggs">
-      <button class="sugg" onclick="ask('Explain the full CPE architecture and how its elements work together')">How does CPE architecture work?</button>
-      <button class="sugg" onclick="ask('Walk me through an example of how settlement price is calculated using CPE')">How is settlement price calculated?</button>
-      <button class="sugg" onclick="ask('What are the key CPE transaction codes and what do they do?')">Key CPE T-codes?</button>
-      <button class="sugg" onclick="ask('Explain Quantity Conversion Rule in CPE')">Quantity Conversion Rule?</button>
-    </div>
-  </div>
-</div>
-
-<div class="input-wrap">
-  <div class="input-row">
-    <textarea id="inp" rows="1" placeholder="Ask about SAP CPE concepts…" oninput="resize(this)"></textarea>
-    <button id="send" onclick="send()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-    </button>
-  </div>
-  <p class="hint">Enter to send · Shift+Enter new line</p>
-</div>
+<div id="chat"></div>
 
 <script>
-const KNOWLEDGE = `
-=== SAP CPE LEARNING JOURNEY — COMPLETE KNOWLEDGE BASE ===
+const chat = document.getElementById("chat");
+const inp = document.getElementById("inp");
 
-SOURCE: "Learning Journey on SAP CPE Vol 1 & Vol 2" by Suraj Pratap Singh
-
---- EXCHANGES AND MARKETS ---
-An exchange (trading exchange/venue) is an organized market where tradable securities, commodities, foreign exchange, futures, and options contracts are bought and sold.
-
-FUTURES EXCHANGES: Where standardized futures contracts are traded — contracts to buy/sell financial instruments with delivery at a specified future time. These fall under derivatives. Future prices are published by publishers for each delivery period.
-
-SPOT EXCHANGES (Cash Markets): Trades occur immediately (within 2 business days) after a transaction. Spot price is available for the commodity for that day only. No future prices published. Can be privately operated or controlled by industry/government.
-
-FUTURES PRICES: Prices for the current delivery period AND succeeding future delivery periods for that day. Number of future delivery periods published depends on commodity and publisher.
-
-SPOT PRICES: A single price for a day for the current delivery period only. Also called Cash Price.
-
-STOCK MARKET vs STOCK EXCHANGE:
-- Stock Market: General term — organized place where buyers and sellers meet to trade securities. Comprises stock exchanges.
-- Stock Exchange (e.g., BSE, NSE, NYSE, NASDAQ): Specific entity/organization providing avenue for trading stocks. Operates under the stock market. Works under profit-making motive.
-
---- PRODUCTS (OIL & GAS EXAMPLES) ---
-PETROLEUM: Naturally occurring yellow-to-black liquid found beneath earth. Components separated using fractional distillation. Contains hydrocarbons of different lengths. Covers both unprocessed crude oil AND refined products.
-
-CRUDE OIL: Naturally occurring unrefined petroleum composed of hydrocarbon deposits. Obtained through drilling (alongside natural gas above, saline water below). Refined into gasoline, kerosene, asphalt. Two contract types: Futures contracts & Spot contracts. Prices from publishers: CME, ICE, OPIS, Argus, Platts.
-
-GASOLINE (PETROL): Transparent petroleum-derived liquid. From fractional distillation. A 42-US-gallon (160-liter) barrel of crude yields ~19 US gallons (72 liters) of gasoline. Pricing driven by market quoted prices from CME, ICE, OPIS, Argus, Platts.
-
-PRICE FLUCTUATION FACTORS for commodity prices:
-- OPEC decisions (Organization of Petroleum Exporting Countries)
-- Supply and Demand
-- Natural Disasters
-- Production Cost
-- Stocks
-- Market Expectations
-- Delivery Date
-- Delivery Location
-- Quality
-- Cost of Carry
-
---- DCS ID (DERIVATIVE SPECIFICATION CODE) ---
-DCS ID captures data for a product at a location. It is a blueprint containing rules and conditions agreed upon at an exchange that form the contract basis for trading a specific commodity or financial instrument.
-
-DCS ID represents: Product Specification published on exchanges for a Product + Location combination.
-
-Key fields in DCS ID (Transaction code: FDCS01):
-- Derivative Contract Specification ID
-- DCS Id (Text) e.g., "CL" for WTI Crude
-- Derivative Category (e.g., 1 Commodity Futures)
-- Status (e.g., 2 Released)
-- Product Symbol (e.g., CL — Product Code)
-- Commodity (e.g., CRUDE — Crude Oil)
-- Unit of Measure (e.g., BB6 — Barrel(s) 60F)
-- Period Determination (e.g., FUT_GEN — FUTURES Generic Determination or SPT_GEN for Spot)
-- Expiration Date Logic (e.g., 400 Last Trading Date)
-- Reporting Date Logic (e.g., 500 Last Quotation Date)
-- Maturity Code Determination (e.g., MAN — Manual Input)
-- Prompt Date Calendar (e.g., XB — NYMEX)
-- Market Identifier Codes (MICs) — assigned publishers
-
-NYMEX WTI Crude (CL) Example contract specs:
-- Contract Unit: 1,000 barrels (lot size)
-- Price Quotation: U.S. dollars and cents per barrel
-- Tick Size: 0.01 per barrel = $10.00
-- Product Code: CME Globex: CL
-
-DCS PERIODS (Roll Structure): Most important periods:
-- CONTRACT PERIOD: Determines delivery period — when delivery is expected. Example: MAY_2020, JUN_2020, JUL_2020, etc.
-- TRADING PERIOD: Period until which contract for a delivery period can be traded on exchange.
-- PHYSICAL SETTLEMENT PERIOD: Settlement period for physical delivery.
-- QUOTATION PERIOD: Period during which exchange publishes prices for that DCS ID.
-- MATURITY KEY DATE: Date in month when next period roll happens — when last quotation prices are received or until when contracts can be traded for a contract period.
-
-SPOT DCS IDs (like CARBOB Regular at Los Angeles): Do NOT have forward roll structures. Publish prices for ONE day only, without validity for delivery periods.
-
---- MIC (MARKET IDENTIFIER CODE) ---
-MIC in SAP S4 represents the vendor/Publisher of market prices.
-
-Main Publishers (MICs):
-- CME (Chicago Mercantile Exchange)
-- ICE (Intercontinental Exchange)
-- Platts (PLUS)
-- Argus (AR_)
-- OPIS (OPSP — OPIS Spot)
-These publishers are assigned to DCS IDs for which they publish prices.
-
---- PRICE TYPE ---
-Publishers (MIC) publish different types of prices for commodities. Price Types can be:
-- HIGH
-- LOW
-- SETTLE
-- CLOSE
-- AV Average
-In SAP S4, this is captured as Price Type.
-
---- MARKET CURVE / QUOTATION RULE ---
-The combination of DCS + MIC + Price Type = Market Curve.
-
-Traders use market curves when:
-1. Creating Physical or Financial Deals (contracts)
-2. Marking their position/exposures
-
-In SAP, Market Curves are represented by QUOTATION RULES.
-
-Quotation Rule contains:
-- DCS ID (Product + Location)
-- MIC (Publisher)
-- Price Type
-- Maturity details (Maturity Sel. Type, DCS Period Type, Maturity Sel. Rt.)
-
-BASIS Quotation Rules: Used for calculating Basis prices — secondary prices like locational differentials, quality differentials.
-
-Example Quotation Rule: "OPSP/CARBOB REG@LOS ANGELES/CL"
-- Quot. Key Type: 1 Derivative Contract Specification
-- DCS ID: CARBOB REG@LOS ANGELES
-- Derivative Category: Commodity Futures
-- MIC: OPIS Spot
-- Price Type: Close
-- Maturity Sel. Type: Quotation-Date-Based (Nearby Logic)
-- DCS Period Type: QP (Quotation Period)
-- Maturity Sel. Rt.: 100001 (Nearby Maturity)
-- QuotForecast Routine: 3 (Quotation Forecast w/o Commodity Curve)
-
---- CPE STRUCTURE (COMMODITY PRICING ENGINE) ---
-CPE = Commodity Pricing Engine — SAP's pricing engine as part of Commodity Management Solution.
-
-CPE ELEMENTS (Key objects):
-1. Formula Key (Formula Assembly)
-2. Term Key
-3. Term Rule
-4. Period Determination Rule
-5. Quotation Rule
-6. DCS
-7. MIC
-8. Price Type
-
-HOW CPE ARCHITECTURE WORKS:
-- Formula Input → (Combination Rule) → CPE Formula Evaluation → Formula Output (Formula result)
-- Document Data feeds into CPE: Product quality, Quantities in multiple UoMs, Ref. Dates, Business data
-- Customizing/Master Data feeds: Stock market prices, Currency exchange rates, Calendar functions
-- Multiple Terms (Term 1, Term 2... Term n) with their Rules feed into the Combination Rule
-- Each Term produces a Result; combined into final Formula result
-
-CPE runs in: Contracts, Orders, and Invoices for SD, MM and GTM applications — same behavior across all.
-
-PERIOD DETERMINATION RULE: Determines the pricing window — which days/dates to pick up market prices.
-- Can be: day of movement (delivery) OR monthly average during month goods were moved.
-- Ref Date Routine: References the pricing date in the logistics document
-- Date Offset Routine + No Time Units: Shift days by number of units (days/weeks/months) from referenced date
-- Time UoM Routine: Use monthly average price for calculation
-- Closed Days Routine: How system behaves if a day within window falls on weekend/holiday (e.g., "11 Use Previous Workday", "30 On Sunday next workday, otherwise prev.")
-- Missing Entry Routine: How system behaves if expected price is missing (e.g., "13 Use Previous Workday, Set Billing Block")
-- Date List Routine: "1 Entry per Day: without Time (Default)"
-- Source Routine: "1 Quotations from Market Data Table"
-
---- FORMULA KEY ---
-A Formula Key represents the pricing formula agreed between trader and counterparty.
-
-The formula defines:
-- Which market curve(s) to use
-- Any premium or discount
-- Pricing window
-- How to combine market curves
-
-Formula Key fields:
-- Formula Key (unique ID)
-- Condition Type
-- Valid From
-- Description
-- Commodity UoM
-- Formula Currency
-- Formula Price Unit
-- Formula UoM
-- Form.Eval.Rtine: 1 (SAP CPE Formula Evaluation)
-- Combination Routine: 4 (Weighted Sum of Terms)
-- Splitting Routine: 2 (Given Term Quantity or Factors)
-- Qty Conversion Rule: 130 (Order: Material Master; Billing: QCI)
-- Commodity Quantity / Item Quantity
-- Latest Eval. Date R.
-- Forecast Mode (If Proposed)
-- ExRateForecast Rout: 1 (Use FX Forward Rates)
-
-Term Keys (with market curve details) are at node "Terms of Formula" on the Formula.
-Rounding rules for results can also be defined at different spots on the Formula.
-
-COMBINATION ROUTINE examples:
-- 4: Weighted Sum of Terms (add all curves)
-- 3: Highest Term (choose highest price curve)
-- 2: Lowest Term (choose lowest price curve)
-- 1: Average of Terms
-
---- TERM KEY ---
-Term Key contains:
-- Term Rule
-- Quotation Rule (specifies the market curve)
-
-Term Key fields:
-- Term Key (unique ID)
-- Condition Type
-- Valid From
-- Description (e.g., "HVC Term Key")
-- Calculation Type: 2 (Rate Based 2 — Quotation Rate leading)
-- Quotation Rule (e.g., ZERO)
-- Term Rule (e.g., HVC Term Rule)
-
-Conversions of Term and Roundings of Term can also be configured.
-
---- TERM RULE ---
-Term Rule contains:
-- Period Determination Rule for quotation prices
-- FX rates window
-
-Term Rule fields:
-- Term Rule (unique ID)
-- Calculation Rule: 1 (Average/Default)
-- Surcharge Rule
-- Period Det. Rule (determines window/days for quotation prices — "Day Of" example)
-- PerDetRule Curr (determines window/days for FX rates — "FX Currency conversion" example)
-- Price Fixation Rule
-
---- CPE INTEGRATION WITH PRICING ---
-CPE is integrated with SAP pricing through CONDITION TYPES.
-
-Setup required (in Display IMG):
-- Basic Functions → Pricing → Pricing Control
-  - Define Condition Tables
-  - Define Condition Types (assign Calculat.type = Q "Commodity Price" to CPE condition types)
-  - Define Access Sequences
-  - Define And Assign Pricing Procedures
-  - Define Pricing By Item Category
-
-CPE condition types show a "zoom button" in Sales Orders to view pricing tree details.
-
---- EXAMPLE: SALES ORDER PRICE DERIVATION ---
-Sales Order with Pricing Date: 6th December 2019, Quantity: 7,755 UG6
-
-Pricing tree shows:
-- Settlement Price condition type
-- Formula Key: HVC Formula
-- Status: 1 Evaluated Successfully and Final
-- Formula Rate: 1.73225 US6 / 1 UG6 → Net Value: 11,378.52 USD
-
-Terms:
-- Term 1: Status Green, Period Det Rule applied, Ref.Date = 12/06/2019, Start/End = 12/06/2019
-- Term 2: Similar
-
-Quotation Rule used: OPSP41 OPSP/SUB-OCT REG...
-- DCS ID: SUB-OCT REG@LOS AN
-- MIC: OPIS Spot
-- Price Type: AV Average
-- Maturity: Nearby
-- Period Type: QP (Quotation Period)
-
-Period Determination: Reference Date = Pricing Date (12/06/2019), no offset, window = 1 day.
-
-Price fetched: For DCS/MIC/Price Type on 12/06/2019 → 1.6124 USD
-Transaction to check prices: FDCS17
-
-Term 1 Rate: 1.6124 USD/UG6 → Term Value: 525,174.804 USD
-Term 2 Rate: 1.8521 USD/UG6 → Term Value: 603,247.491 USD
-
-Combination Rule: Weighted Sum of Terms
-Sum = 1.6124 + 1.8521 = 3.4645 USD/UG6
-Converting UG6→BB6: 3.4645 × 42 = 145.509 US6/BB6 = Final Formula result
-
---- CPE CUSTOMIZING (VOL 2) ---
-IMPORTANT TRANSACTION CODES for CPE:
-- VCPE_WB or MCPE_WB — Workbench (V=Sales/SD side, M=Purchase/MM side)
-- VCPE_RULE or MCPE_RULE — Rule maintenance
-- VCPE_CUS or MCPE_CUS — CPE Customizing (for CPE routines setup)
-- VCPE_MD or MCPE_MD — Master Data / Specify Components for Formula Assembly
-- FDCS01 — Display/Create Derivative Contract Specification (DCS ID)
-- FDCS17 — Display/Edit Commodity Prices
-
-Note: "V" = Sales side (SD), "M" = Purchase side (MM). Most CPE customizing objects are independent of V or M application — can be accessed from either. Objects like DCS/MIC/PT or Formula are application-independent.
-
-CPE Structure tree in customizing (VCPE_CUS):
-- Commodity Pricing
-  - Commodity Pricing Engine
-    - General CPE Settings
-      - Activate CPE Rule Maintenance in Master Data or Customizing
-      - Define CPE Submodule for CPE Analysis
-      - Define CPE Routine
-      - Define Partner- or Customer-Specific CPE Routine
-      - Define Partner- or Customer-Specific Status Values
-      - Define Rounding Rule
-      - Define Quantity Conversion Source
-      - Define Quantity Conversion Rule
-      - Define Conversion Place During Evaluation
-      - Define Conversion Rule
-      - Define CPE Blocking Reasons
-      - Define CPE Extension
-      - Rename Price Fixation Group
-      - BAdI: Maintain Input and Output Fields of CPE Objects
-      - BAdI: Mapping between BAPIs and CPE Objects
-      - BAdI: CPE Extension Processing
-    - Application-Specific CPE Settings
-    - Term-Specific CPE Settings
-    - Definition of CPE Quotations
-  - Settings for Formula Assembly
-    - Maintain Field Catalog
-    - Maintain Field Mapping
-    - Assign BRFplus Application to Pricing Procedure
-    - BAdI: Formula Assembly for Commodity Pricing Engine
-  - SD-Specific CPE Objects
-  - CPE in SD Documents
-    - Define Blocking Reason For Billing
-    - Assign CPE Blocking Reasons to SD Blocking Reasons
-    - Define Billing Types of Diff. Invoicing for Billing Due List
-  - Business Add-Ins for CPE
-  - Manual Market Data Entry for Currencies
-
---- CPE ROUTINES (VOL 2) ---
-CPE Routines are viewed under the tree node in VCPE_CUS.
-
-BADI-based custom routines can be created for each sub-module.
-
-Key Sub-Modules and their routines (FE = Formula Evaluation):
-
-FE CPE Formula Evaluation:
-- SM 01: Formula Evaluation Routine 1 — SAP CPE Formula Evaluation (BADI: BADI_CPE_FE_EVALUATION_ROUTINE)
-- SM 02: Quantity Split Routine 1 — Whole Quantity for every Term
-- SM 02: Quantity Split Routine 2 — Given Term Quantity or Factors
-- SM 02: Quantity Split Routine 3 — Equal Split between all Terms
-- SM 02: Quantity Split Routine 4 — Converts Quantity into Comm. UoM of Term
-- SM 04: Combination Routine 1 — (BADI: BADI_CPE_FE_COMBINATION_ROUTINE)
-- SM 04: Combination Routine 2 — Highest Term
-- SM 04: Combination Routine 3 — Lowest Term (Average of Terms in description)
-- SM 04: Combination Routine 4 — Weighted Sum of Terms
-
-Most commonly used sub-modules for CUSTOM routines:
-1. Combination Routine
-2. Quantity Split Routine
-3. Closed Days Routine
-4. Period Determination Routine
-5. Date Offset Routine
-6. Quantity Conversion Routine
-
---- IMPORTANT CPE SETUP (VOL 2) ---
-
-1. ACTIVATING CPE RULE MAINTENANCE:
-Defines if CPE objects (like Formula, Term Key) are maintained as Master Data or as Customizing config only.
-Approach options: 1 = Master Data, 2 = Customizing
-Current standard: Timestamp 16.05.2017 17:18:23 → 1 Master Data
-
-2. QUANTITY CONVERSION RULE:
-Used when quoted price and transaction volume don't share same UoM. Conversion routines run in background.
-Standard delivered rules:
-- Rule 10: Material Master (Conv Rule 1)
-- Rule 20: Manual Factors (Conv Rule 2)
-- Rule 40: Manual Factors from ERP Pricing (Conv Rule 4)
-- Rule 60: Adjusted Quantity (Conv Rule 6)
-- Rule 110: Order: Material Master; Billing: Manual (Conv Rule 11)
-- Rule 120: Order: Material Master; Billing: Batch (Conv Rule 12)
-- Rule 150: Batch if entered else Material Master (Conv Rule 15)
-- Rule 160: Order/Return: Mat. Mstr; Billing: Batch (Conv Rule 16)
-Rounding rule can be assigned to each conversion rule to define decimal places.
-
-3. CONVERSION PLACE:
-Specific spots in CPE evaluation where conversions happen:
-- Converting FX rates
-- Converting quantity conversions
-- Converting quotation rates or surcharge rates
-Can happen at Term level or Formula level.
-Standard delivered conversion places run automatically. Users can adjust by assigning new conversion rule.
-Examples: 
-- 11: Evaluation: Commodity UoM to Formula UoM (Conversion)
-- 12: Evaluation: Formula to Document Currency (Conversion)
-- 21: Quantity Split Routine: Round Term Quan. (Rounding)
-- 31: Combination Rule: Term to Formula Rate (Conversion)
-- 32: Combination Rule: Round Formula Rate (Rounding)
-- 61: Source Routine: Quotation to Quot.Grp (Conversion)
-
-4. CONVERSION RULE:
-Controls how conversion of Term or Quotation values happens during Formula Evaluation.
-Standard rules have Conversion Routines assigned. Custom rules can be created.
-Best practice: Do NOT change standard rules — create new custom data instead.
-Example rules:
-- Rule 110: First Material Master, then Rate Type M (ConvRtn 1)
-- Rule 111: Billing: Manual, then Rate Type M
-- Rule 1000: Currency Conversion with Rate Type M
-
---- CPE BLOCKING REASONS (VOL 2) ---
-CPE-specific blocking reasons for sales/purchase orders. Different from core SD blocking reasons.
-Used to control orders from invoicing based on pricing status.
-
-Standard CPE Blocking Reasons:
-- 0C: Missing Currency Exchange Rate
-- 0P: Provisional Price
-- 0Q: Missing Price Quotation
-
-If market price or FX rate is provisional/missing → blocking status set at Term/Formula level → blocks final invoice creation.
-PROVISIONAL BLOCK: Can still create Provisional Invoice.
-
-To ignore blocks for specific condition type: Use node "Define Condition-Type-Specific Settings" under Application-Specific CPE settings.
-
-Assigning to billing docs: Assign CPE blocking reasons to SD billing blocking reasons to trigger for specific Billing Document types.
-
---- BRF+ RELEVANCY FOR CPE PRICING (VOL 2) ---
-BRF+ (Business Rules Framework Plus) is used for Formula Assembly determination.
-
-SETTINGS FOR FORMULA ASSEMBLY:
-Required to trigger Formula Assembly Evaluation from BRF+. BRF+ Decision table controls Formula and Term level details for Formula Evaluation.
-
-BRF+ Standard CPE Application has pre-existing data elements. New data elements can be added.
-
-MAINTAIN FIELD CATALOG:
-Add new field catalog (data elements) to BRF+ structures for Formula Assembly.
-Pre-existing Formula Assembly Fieldnames and their Data Elements:
-- CONTRACT → VGBEL
-- CURRENCY → WAERK
-- CUST_GROUP → KDGRP
-- DIS_CHANNEL → VTWEG
-- DIVISION → SPART
-- DOCUMENT → BELNR_D
-- INC01 → INC01
-- INC02 → INC02
-- INC02_L → INC02_L
-- INC03_L → INC03_L
-- INFO_TYPE → ES0KZ
-
-MAINTAIN FIELD MAPPING:
-Maps Formula Assembly fields to S4 structures (e.g., pricing structure KOMK/KOMP/VBAK/VBAP).
-Must maintain for each Application (V or M).
-
-CPE FA Fieldmapping examples:
-- KOMK → INC01, INC02, INC02_L, INC03_L, KDGRP (CUST_GROUP), KUNNR (SOLD_TO_PARTY), KUNWE (SHIP_TO_PARTY), SPART (DIVISION), VKORG (SALES_ORG), VTWEG (DIS_CHANNEL)
-- KOMP → KONDM (MAT_PR_GROUP), KPOSN (REFITEM), MATNR (MATERIAL), VGBEL (CONTRACT), WERKS (PLANT)
-- VBAK → VBELN (CONTRACT)
-- VBAP → ROUTE
-
-ASSIGN BRFPLUS APPLICATION TO PRICING PROCEDURE:
-Must assign BRF+ Application/Function to Pricing Procedure for each Application.
-This triggers BRF+ to use right rules → derive right Formula & Term level details for CPE evaluation.
-Example: Application V Sales and Distribution, Procedure CMAL01, BRFplus Appl. Name COPPER_CPE_FA_DEVTEST
-BRF+ Functions assigned: APPL_V_FUNCTION_TERM, APPL_V_FUNCTION_FORMULA
-
-SPECIFY COMPONENTS FOR FORMULA ASSEMBLY (VCPE_MD / MCPE_MD):
-Assign BRF+ Application, Function, and Decision Table to enter Business data.
-Fields: Application, BRFplus Application, Function, Decision Table.
-
-=== END OF KNOWLEDGE BASE ===
-`;
-
-const SYSTEM = `You are an expert SAP CPE (Commodity Pricing Engine) learning assistant. You have been trained on the complete content of "Learning Journey on SAP CPE Vol 1 & Vol 2" by Suraj Pratap Singh.
-
-Your knowledge base:
-${KNOWLEDGE}
-
-RULES:
-1. Answer ONLY from the knowledge base above. This is your primary dataset.
-2. If a question is outside this dataset, say so clearly and suggest related topics you CAN answer.
-3. Use simple, clear language. Explain SAP terminology in plain English first, then use the SAP terms.
-4. Structure answers with clear sections when needed. Use **bold** for key SAP terms.
-5. Reference specific transaction codes (T-codes) when relevant.
-6. Give examples from the documents when available (e.g., WTI Crude, CARBOB Regular at Los Angeles).
-7. Keep responses focused and digestible — not overwhelming.
-8. Always be encouraging to the learner.
-9. If asked for a summary or overview, provide a structured breakdown.`;
-
-const chat = document.getElementById('chat');
-const inp = document.getElementById('inp');
-const sendBtn = document.getElementById('send');
 let busy = false;
-const history = [];
 
-function resize(el){
-  el.style.height='auto';
-  el.style.height=Math.min(el.scrollHeight,100)+'px';
+function addMessage(role, text) {
+  const div = document.createElement("div");
+  div.className = "msg";
+  div.innerHTML = role === "user"
+    ? "<span class='user'>You:</span> " + text
+    : "<span class='bot'>Bot:</span> " + text;
+
+  chat.appendChild(div);
 }
 
-inp.addEventListener('keydown',e=>{
-  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}
-});
+async function send() {
+  const text = inp.value.trim();
+  if (!text || busy) return;
 
-function ask(t){inp.value=t;send();}
+  busy = true;
 
-function addMsg(role,html){
-  document.getElementById('welcome')?.remove();
-  const d=document.createElement('div');
-  d.className=`msg ${role}`;
-  const label=role==='bot'?'CPE':'You';
-  d.innerHTML=`<div class="av ${role}">${label}</div><div class="bub">${html}</div>`;
-  chat.appendChild(d);
-  chat.scrollTop=chat.scrollHeight;
-  return d;
-}
+  addMessage("user", text);
+  inp.value = "";
 
-function showTyping(){
-  const d=document.createElement('div');
-  d.className='msg bot typing';d.id='typing';
-  d.innerHTML=`<div class="av bot">CPE</div><div class="bub"><div class="dots"><span></span><span></span><span></span></div></div>`;
-  chat.appendChild(d);chat.scrollTop=chat.scrollHeight;
-}
-
-function fmt(t){
-  // bold **text**
-  t=t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
-  // inline code `text`
-  t=t.replace(/`([^`]+)`/g,'<code>$1</code>');
-  // bullets
-  t=t.replace(/^[-•*]\s(.+)/gm,'<li>$1</li>');
-  t=t.replace(/(<li>[\s\S]+?<\/li>)/g,'<ul>$1</ul>');
-  // numbered
-  t=t.replace(/^\d+\.\s(.+)/gm,'<li>$1</li>');
-  // double newline = paragraph break
-  t=t.replace(/\n\n/g,'</p><p style="margin-top:8px">');
-  t=t.replace(/\n/g,'<br>');
-  return `<span class="src-tag">SAP CPE Vol 1+2</span><br>${t}`;
-}
-
-async function send(){
-  const text=inp.value.trim();
-  if(!text||busy)return;
-  busy=true;sendBtn.disabled=true;
-  inp.value='';inp.style.height='auto';
-  addMsg('user',text);
-  history.push({role:'user',content:text});
-  showTyping();
-  try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
-        system:SYSTEM,
-        messages:history
+  try {
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: text
       })
     });
-    document.getElementById('typing')?.remove();
-    if(!r.ok){const e=await r.json();throw new Error(e.error?.message||'API error');}
-    const data=await r.json();
-    const reply=data.content[0].text;
-    history.push({role:'assistant',content:reply});
-    addMsg('bot',fmt(reply));
-  }catch(e){
-    document.getElementById('typing')?.remove();
-    addMsg('bot',`<span style="color:#c85c2a">Error: ${e.message}</span>`);
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "API Error");
+    }
+
+    addMessage("bot", data.reply);
+
+  } catch (error) {
+    addMessage("bot", "Error: " + error.message);
   }
-  busy=false;sendBtn.disabled=false;inp.focus();
+
+  busy = false;
 }
 </script>
+
 </body>
 </html>
