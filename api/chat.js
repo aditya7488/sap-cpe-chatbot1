@@ -52,7 +52,7 @@ User: ${message}
 `;
 
     const response = await fetch(
-       `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=AIzaSyDgy1EV4AxmSCWL31tSoFDJ9lpFqx5QrO0`,
+       `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=AIzaSyC0JX4S8YDHdM5uxVTg8eJrKK28_X0Ae9w`,
       {
         method: "POST",
         headers: {
