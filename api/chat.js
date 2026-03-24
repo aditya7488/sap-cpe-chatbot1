@@ -8,7 +8,6 @@ export default async function handler(req, res) {
       : req.body;
 
     const dataDir = path.join(process.cwd(), "data");
-
     const files = fs.readdirSync(dataDir);
 
     let knowledge = "";
@@ -22,7 +21,6 @@ export default async function handler(req, res) {
       }
     });
 
-    // 🔥 DEBUG (IMPORTANT)
     console.log("Loaded knowledge length:", knowledge.length);
 
     if (!knowledge) {
@@ -31,7 +29,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // 🔥 Simple search (avoid overload)
+    // 🔥 Simple filtering
     const chunks = knowledge.split("\n\n");
 
     const relevantChunks = chunks
@@ -51,8 +49,9 @@ ${finalKnowledge}
 User: ${message}
 `;
 
+    // 🔥 GEMINI CALL (FINAL FIX)
     const response = await fetch(
-       `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyC0JX4S8YDHdM5uxVTg8eJrKK28_X0Ae9w`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=YOUR_API_KEY`,
       {
         method: "POST",
         headers: {
@@ -72,9 +71,13 @@ User: ${message}
 
     console.log("Gemini response:", JSON.stringify(data));
 
-    const reply =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "No response from AI";
+    let reply = "No response from AI";
+
+    if (data?.candidates?.length) {
+      reply = data.candidates[0]?.content?.parts?.[0]?.text || reply;
+    } else if (data?.error) {
+      reply = "API Error: " + data.error.message;
+    }
 
     res.status(200).json({ reply });
 
@@ -83,4 +86,3 @@ User: ${message}
     res.status(500).json({ error: "Server error" });
   }
 }
-
