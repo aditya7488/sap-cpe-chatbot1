@@ -51,7 +51,7 @@ User: ${message}
 
     // 🔥 GEMINI CALL (FINAL FIX)
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=YOUR_API_KEY`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyC0JX4S8YDHdM5uxVTg8eJrKK28_X0Ae9w`,
       {
         method: "POST",
         headers: {
